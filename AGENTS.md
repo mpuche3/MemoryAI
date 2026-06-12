@@ -21,6 +21,7 @@ All memory files are plain Markdown (.md) or text (.txt). This keeps the reposit
 - raw_knowledge_files/ : inbox for raw files (pdf, pptx, docx, md, txt, ...) waiting to be ingested. Contains tracker.md.
 - raw_markdowns/       : permanent Markdown snapshots of ingested raw files, produced by MarkItDown during ingestion. Named <original_filename>.md. Never deleted.
 - .github/skills/      : skills (step-by-step procedures) available to the agent, one folder per skill with a SKILL.md inside.
+- requirements.txt     : Python dependencies for the ingestion tooling.
 - .venv/               : Python virtual environment with markitdown[all] and pymupdf installed, used by the ingestion skill. Not committed to git.
 
 ## 3. Global Formatting Rules
@@ -29,6 +30,7 @@ All memory files are plain Markdown (.md) or text (.txt). This keeps the reposit
 2. Use plain "Key: value" lines for metadata. No YAML front matter fences. The only exception is SKILL.md files under .github/skills/, which require YAML front matter for VS Code to discover them.
 3. Keep lines reasonably short and prose simple, so raw reading is comfortable.
 4. File names: KB followed by exactly 4 digits for knowledge files (KB0000.md), LL followed by exactly 4 digits for lesson files (LL0000.md). Numbers are sequential, never reused, never renumbered.
+5. Date-stamp volatile facts. Knowledge that changes over time (versions, prices, APIs, settings, people in roles) must be phrased with its reference date, e.g. "As of 2026-06, the latest version is 1.27". Stable facts need no date.
 
 ## 4. Knowledge Base File Structure (KBxxxx.md)
 
@@ -137,6 +139,7 @@ Reusable procedures live in .github/skills/, one folder per skill with a SKILL.m
 - ingest-raw-knowledge   : ingest raw files from raw_knowledge_files/ into the knowledge base (implements Sections 7 to 9).
 - capture-lesson-learnt  : record a lesson from the current session into lessons_learnt/ (implements Sections 5, 6 and 10).
 - validate-memory        : check repository consistency (naming, indexes, no tables, metadata, sections, tracker) and fix reported errors.
+- dreaming               : memory consolidation pass; merge overlaps, fix drifted summaries/indexes/links, split oversized files, then validate.
 
 When performing one of these actions, follow the corresponding skill. If a skill and this file ever disagree, this file wins; fix the skill.
 

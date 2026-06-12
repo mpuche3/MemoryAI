@@ -40,6 +40,7 @@ Extract ALL information from raw files in raw_knowledge_files/ and store it in k
    - Update the Updated date.
    - Cross-link related KB and LL files in Related (both directions when meaningful).
    - NEVER use Markdown tables. Plain "Key: value" lines, no YAML fences inside KB files.
+   - Date-stamp volatile facts (versions, prices, APIs, roles): "As of YYYY-MM, ...". Stable facts need no date.
    - If a file would exceed roughly 500 lines, split by subtopic.
 8. Update knowledge_base/index.md: one line per file, alphabetical order, format "KBxxxx.md - brief description". Required for every new file or topic change.
 9. Append one line per ingested raw file to raw_knowledge_files/tracker.md, at the bottom, never rewriting old lines:
@@ -52,7 +53,7 @@ Extract ALL information from raw files in raw_knowledge_files/ and store it in k
 - The conversion uses the Python virtual environment at .venv/ in the repository root, with the packages markitdown[all] and pymupdf installed.
 - If .venv/ is missing or packages are not installed, recreate it from the repository root:
   python -m venv .venv
-  .venv\Scripts\python.exe -m pip install "markitdown[all]" pymupdf
+  .venv\Scripts\python.exe -m pip install -r requirements.txt
 - The script [convert_to_markdown.py](./scripts/convert_to_markdown.py) accepts optional file paths to convert specific files, and --force to overwrite existing snapshots.
 - The script [extract_images.py](./scripts/extract_images.py) accepts optional file paths, --dpi N (default 150) and --max-pages N (default 100). With no arguments it processes all pending pdf/pptx/docx/xlsx files.
 
