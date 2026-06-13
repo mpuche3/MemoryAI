@@ -1,6 +1,6 @@
 ---
 name: ingest-raw-knowledge
-description: 'Ingest raw files (pdf, pptx, docx, md, txt, ...) from raw_knowledge_files/ into the knowledge base. Use when the user asks to ingest, process, extract or absorb raw files, or to update the knowledge base from new documents. Converts files to Markdown with Microsoft MarkItDown (snapshots kept in raw_markdowns/), extracts all knowledge into KBxxxx.md files, updates index and tracker, then deletes the raw files.'
+description: 'Ingest raw files (pdf, pptx, docx, md, txt, ...) from raw_knowledge_files/ into the knowledge base. Use when the user asks to ingest, process, extract or absorb raw files, or to update the knowledge base from new documents. Converts files to Markdown with Microsoft MarkItDown (snapshots kept in raw_markdowns/), extracts all knowledge into kb-<slug>.md files, updates index and tracker, then deletes the raw files.'
 ---
 
 # Ingest Raw Knowledge
@@ -32,7 +32,7 @@ Extract ALL information from raw files in raw_knowledge_files/ and store it in k
 5. Read knowledge_base/index.md to learn which topics already have KB files.
 6. For each raw file, split its content by topic:
    - If a KB file on that topic exists, ENRICH it. Do not create a duplicate.
-   - Only create a new KB file (next free KBxxxx number, 4 digits, sequential) for genuinely new topics.
+   - Only create a new KB file for genuinely new topics, named kb-<slug>.md (lowercase kebab-case naming the topic, e.g. kb-kubernetes-rollback.md).
    - One coherent topic per file. A single raw file may feed several KB files.
 7. Write or update each KB file with the exact structure required by AGENTS.md Section 4, starting new files from [the KB template](./assets/template.md):
    metadata block (ID, Title, Created, Updated, Tags), Summary, Index, Sources, Related, then the knowledge sections exactly as listed in the Index.
@@ -43,9 +43,9 @@ Extract ALL information from raw files in raw_knowledge_files/ and store it in k
    - NEVER use Markdown tables. Plain "Key: value" lines, no YAML fences inside KB files.
    - Date-stamp volatile facts (versions, prices, APIs, roles): "As of YYYY-MM, ...". Stable facts need no date.
    - If a file would exceed roughly 500 lines, split by subtopic.
-8. Update knowledge_base/index.md: one line per file, alphabetical order, format "KBxxxx.md - brief description". Required for every new file or topic change.
+8. Update knowledge_base/index.md: one line per file, alphabetical order, format "kb-<slug>.md - brief description". Required for every new file or topic change.
 9. Append one line per ingested raw file to raw_knowledge_files/tracker.md, at the bottom, never rewriting old lines:
-   original_filename -> KBxxxx[, KByyyy, ...] (YYYY-MM-DD)
+   original_filename -> kb-<slug>[, kb-<other-slug>, ...] (YYYY-MM-DD)
 10. Only after the KB files, index, tracker AND the raw_markdowns/ snapshot are all written successfully, delete the raw file from raw_knowledge_files/ and its _extracted_images/<original_filename>/ subfolder if present.
 11. Report to the user: which raw files were ingested, which KB files were created or enriched, and anything that could not be extracted (including visual content).
 

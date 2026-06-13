@@ -1,4 +1,4 @@
-ID: LLxxxx
+ID: ll-lesson-slug
 Title: Short descriptive title of the lesson
 Created: YYYY-MM-DD
 Updated: YYYY-MM-DD
@@ -18,8 +18,8 @@ A short paragraph describing what lesson(s) this file holds and when they apply.
 
 # Related
 
-- KBxxxx.md - why it is related
-- LLyyyy.md - why it is related
+- kb-related-topic.md - why it is related
+- ll-related-lesson.md - why it is related
 
 # 1. Lesson section title
 

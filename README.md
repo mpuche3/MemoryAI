@@ -21,6 +21,7 @@ The agent (GitHub Copilot in VS Code) operates this repository under a binding c
 - **Full provenance.** Every knowledge file lists its sources; an append-only tracker records every ingested file and where its knowledge went; permanent Markdown snapshots of the originals are kept. You can always answer "why does the agent believe this?"
 - **Honest about conflicts.** When new knowledge contradicts what is already stored, the agent never silently overwrites it — it files the conflict in `contradictions/` for a human to resolve, so disagreements are surfaced, not buried.
 - **Versioned like code, because it is like code.** Git gives you history, diffs, rollback and backup of the agent's mind for free. One commit per ingestion = an audit trail of how the memory evolved.
+- **Built for collaboration.** Files are named after their topic (`kb-kubernetes-rollback.md`), not by sequential number, so several people can add knowledge in parallel without merge collisions — and when two people do pick the same name, that is the signal they documented the same topic and should merge it.
 - **Self-maintaining.** The agent doesn't just write memory — it maintains it through built-in procedures (skills):
   - `ingest-raw-knowledge` — documents in, distilled knowledge out
   - `capture-lesson-learnt` — experience in, future-proof rules out
@@ -42,8 +43,8 @@ The agent (GitHub Copilot in VS Code) operates this repository under a binding c
 ## Repository Layout
 
 - AGENTS.md — the contract: every convention, structure and workflow the agent must follow.
-- knowledge_base/ — KBxxxx.md knowledge files plus index.md.
-- lessons_learnt/ — LLxxxx.md lesson files plus index.md.
+- knowledge_base/ — kb-<slug>.md knowledge files plus index.md.
+- lessons_learnt/ — ll-<slug>.md lesson files plus index.md.
 - contradictions/ — conflicts the agent flagged for a human to resolve (empty when none are open).
 - raw_knowledge_files/ — ingestion inbox, plus the append-only tracker.md.
 - raw_markdowns/ — permanent MarkItDown snapshots of every ingested document.

@@ -1,4 +1,4 @@
-ID: KBxxxx
+ID: kb-topic-slug
 Title: Short descriptive title
 Created: YYYY-MM-DD
 Updated: YYYY-MM-DD
@@ -20,8 +20,8 @@ A short paragraph describing what knowledge this file holds and its scope.
 
 # Related
 
-- LLxxxx.md - why it is related
-- KByyyy.md - why it is related
+- ll-related-lesson.md - why it is related
+- kb-related-topic.md - why it is related
 
 # 1. First section title
 

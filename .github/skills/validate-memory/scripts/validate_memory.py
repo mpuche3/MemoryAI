@@ -3,8 +3,9 @@
 Part of the validate-memory skill. Verifies that the memory files follow
 the conventions defined in AGENTS.md:
 
-1. File naming: knowledge_base/ contains only KB followed by exactly 4
-   digits (.md) plus index.md; lessons_learnt/ the same with LL.
+1. File naming: knowledge_base/ contains only kb-<slug>.md files
+   (lowercase kebab-case) plus index.md; lessons_learnt/ the same with
+   ll-<slug>.md.
 2. Index completeness: every KB/LL file has exactly one line in its
    folder's index.md, and the index lists no nonexistent files.
 3. No Markdown tables anywhere (lines starting with |), in any .md file
@@ -14,9 +15,9 @@ the conventions defined in AGENTS.md:
 5. Required sections: every KB/LL file has Summary, Index, Sources and
    Related sections.
 6. Size: warns when a KB/LL file exceeds 500 lines.
-7. Tracker: raw_knowledge_files/tracker.md entries reference existing KB
-   files.
-8. Contradictions: files in contradictions/ are named CD + 4 digits, have
+7. References: Related sections and tracker.md lines that point to a
+   nonexistent kb-/ll- file are flagged as warnings (rename/merge rot).
+8. Contradictions: files in contradictions/ are named cd-<slug>.md, have
    ID/Title/Created/Involves metadata and the required sections.
 
 Usage (from the repository root):
@@ -33,6 +34,8 @@ REPO_ROOT = Path(__file__).resolve().parents[4]
 ERRORS: list[str] = []
 WARNINGS: list[str] = []
 
+SLUG = r"[a-z0-9]+(?:-[a-z0-9]+)*"
+
 
 def error(msg: str) -> None:
     ERRORS.append(msg)
@@ -42,21 +45,27 @@ def warn(msg: str) -> None:
     WARNINGS.append(msg)
 
 
+def memory_stems() -> set[str]:
+    stems = {p.stem for p in (REPO_ROOT / "knowledge_base").glob("kb-*.md")}
+    stems |= {p.stem for p in (REPO_ROOT / "lessons_learnt").glob("ll-*.md")}
+    return stems
+
+
 def check_folder(folder_name: str, prefix: str) -> None:
     folder = REPO_ROOT / folder_name
-    pattern = re.compile(rf"^{prefix}\d{{4}}\.md$")
+    pattern = re.compile(rf"^{prefix}-{SLUG}\.md$")
 
     files = {p.name for p in folder.glob("*.md")} - {"index.md"}
     for name in sorted(files):
         if not pattern.match(name):
-            error(f"{folder_name}/{name}: bad file name (expected {prefix} + 4 digits + .md)")
+            error(f"{folder_name}/{name}: bad file name (expected {prefix}-<slug>.md, lowercase kebab-case)")
 
     index_path = folder / "index.md"
     if not index_path.exists():
         error(f"{folder_name}/index.md is missing")
         return
     index_text = index_path.read_text(encoding="utf-8")
-    listed = re.findall(rf"^({prefix}\d{{4}}\.md)\s*-", index_text, flags=re.MULTILINE)
+    listed = re.findall(rf"^({prefix}-{SLUG}\.md)\s*-", index_text, flags=re.MULTILINE)
 
     for name in sorted(files - set(listed)):
         error(f"{folder_name}/index.md: missing entry for {name}")
@@ -70,10 +79,10 @@ def check_folder(folder_name: str, prefix: str) -> None:
 
     for name in sorted(files):
         if pattern.match(name):
-            check_memory_file(folder / name, prefix)
+            check_memory_file(folder / name)
 
 
-def check_memory_file(path: Path, prefix: str) -> None:
+def check_memory_file(path: Path) -> None:
     rel = f"{path.parent.name}/{path.name}"
     lines = path.read_text(encoding="utf-8").splitlines()
     text = "\n".join(lines)
@@ -112,33 +121,42 @@ def check_no_tables() -> None:
                 error(f"{rel}:{i}: Markdown table detected (tables are forbidden)")
 
 
-def check_tracker() -> None:
+def check_references() -> None:
+    known = memory_stems()
+
+    # Related sections (and any body text) of every KB/LL file.
+    for folder, prefix in (("knowledge_base", "kb"), ("lessons_learnt", "ll")):
+        for path in (REPO_ROOT / folder).glob(f"{prefix}-*.md"):
+            text = path.read_text(encoding="utf-8")
+            for ref in set(re.findall(rf"(?:kb|ll)-{SLUG}", text)):
+                if ref not in known and ref != path.stem:
+                    warn(f"{folder}/{path.name}: references nonexistent {ref}.md")
+
+    # Tracker lines (append-only history may legitimately point to merged files).
     tracker = REPO_ROOT / "raw_knowledge_files" / "tracker.md"
     if not tracker.exists():
         error("raw_knowledge_files/tracker.md is missing")
         return
-    kb_files = {p.name for p in (REPO_ROOT / "knowledge_base").glob("KB*.md")}
     for i, line in enumerate(tracker.read_text(encoding="utf-8").splitlines(), 1):
         if "->" not in line:
             continue
-        for kb in re.findall(r"KB\d{4}", line):
-            if f"{kb}.md" not in kb_files:
-                error(f"raw_knowledge_files/tracker.md:{i}: references nonexistent {kb}.md")
+        for ref in re.findall(rf"kb-{SLUG}", line):
+            if ref not in known:
+                warn(f"raw_knowledge_files/tracker.md:{i}: references nonexistent {ref}.md (merged or renamed?)")
 
 
 def check_contradictions() -> None:
     folder = REPO_ROOT / "contradictions"
     if not folder.exists():
         return
-    pattern = re.compile(r"^CD\d{4}\.md$")
-    known = {p.name for p in (REPO_ROOT / "knowledge_base").glob("KB*.md")}
-    known |= {p.name for p in (REPO_ROOT / "lessons_learnt").glob("LL*.md")}
+    pattern = re.compile(rf"^cd-{SLUG}\.md$")
+    known = memory_stems()
     for path in sorted(folder.glob("*.md")):
         if path.name == "README.md":
             continue
         rel = f"contradictions/{path.name}"
         if not pattern.match(path.name):
-            error(f"{rel}: bad file name (expected CD + 4 digits + .md)")
+            error(f"{rel}: bad file name (expected cd-<slug>.md, lowercase kebab-case)")
             continue
         lines = path.read_text(encoding="utf-8").splitlines()
         text = "\n".join(lines)
@@ -157,16 +175,16 @@ def check_contradictions() -> None:
         for section in ("Summary", "Conflicting Claims", "Analysis", "Suggested Resolutions"):
             if not re.search(rf"^#+\s*{re.escape(section)}\b", text, flags=re.MULTILINE):
                 error(f"{rel}: missing section '{section}'")
-        for ref in re.findall(r"(?:KB|LL)\d{4}", meta.get("Involves", "")):
-            if f"{ref}.md" not in known:
+        for ref in re.findall(rf"(?:kb|ll)-{SLUG}", meta.get("Involves", "")):
+            if ref not in known:
                 warn(f"{rel}: Involves references nonexistent {ref}.md")
 
 
 def main() -> int:
-    check_folder("knowledge_base", "KB")
-    check_folder("lessons_learnt", "LL")
+    check_folder("knowledge_base", "kb")
+    check_folder("lessons_learnt", "ll")
     check_no_tables()
-    check_tracker()
+    check_references()
     check_contradictions()
 
     for msg in WARNINGS:

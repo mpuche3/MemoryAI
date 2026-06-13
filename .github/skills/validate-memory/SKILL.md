@@ -17,14 +17,14 @@ Run the consistency checker and fix what it reports, following the conventions i
 1. Run the checker from the repository root:
    .venv\Scripts\python.exe .github\skills\validate-memory\scripts\validate_memory.py
 2. The script checks:
-   - file naming (KB/LL + exactly 4 digits),
+   - file naming (kb-<slug>.md / ll-<slug>.md, lowercase kebab-case),
    - index.md completeness in both folders (no missing, nonexistent or duplicate entries, alphabetical order),
    - no Markdown tables anywhere (except .github/),
    - metadata blocks (ID, Title, Created, Updated, Tags; ID matches file name; dates in YYYY-MM-DD),
    - required sections (Summary, Index, Sources, Related),
-   - contradiction files in contradictions/ (CD + 4 digits; metadata ID, Title, Created, Involves; required sections; no tables),
+   - contradiction files in contradictions/ (cd-<slug>.md; metadata ID, Title, Created, Involves; required sections; no tables),
    - files over 500 lines (warning),
-   - tracker.md lines referencing nonexistent KB files.
+   - dead references in Related sections and tracker.md lines pointing to nonexistent kb-/ll- files (warning).
 3. Fix every ERROR. Warnings are judgment calls: report them to the user with a recommendation.
 4. Re-run the script until it reports 0 errors.
 5. Report to the user what was found and what was fixed.

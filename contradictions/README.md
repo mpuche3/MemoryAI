@@ -6,7 +6,7 @@ When this folder contains only this README, there are no open contradictions.
 
 ## Files
 
-- CDxxxx.md : one open contradiction. CD followed by exactly 4 digits, numbered sequentially from the highest CD file currently present. Because these files are transient, a number freed by resolution may be reused.
+- cd-<slug>.md : one open contradiction, named in lowercase kebab-case after the conflicting topic, e.g. cd-k8s-rollback-window.md. These files are transient and deleted once resolved.
 - These files never appear in any index and are never cited as evidence in answers.
 
 ## File Format
@@ -21,9 +21,9 @@ Plain lines and sections, no Markdown tables:
 
 ## Lifecycle
 
-1. The agent detects a contradiction and creates a CDxxxx.md file here. It never silently overwrites conflicting knowledge.
+1. The agent detects a contradiction and creates a cd-<slug>.md file here. It never silently overwrites conflicting knowledge.
 2. A human maintainer reviews it and decides the resolution.
 3. The agent applies the decision to the affected KB/LL files.
-4. The CDxxxx.md file is deleted. The resolution lives in the corrected files and the git commit, not in this folder.
+4. The cd-<slug>.md file is deleted. The resolution lives in the corrected files and the git commit, not in this folder.
 
 See the contradictions skill (.github/skills/contradictions/) for the step-by-step procedure.
