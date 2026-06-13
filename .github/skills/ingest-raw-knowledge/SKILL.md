@@ -36,6 +36,8 @@ Extract ALL information from raw files in raw_knowledge_files/ and store it in k
    - One coherent topic per file. A single raw file may feed several KB files.
 7. Write or update each KB file with the exact structure required by AGENTS.md Section 4, starting new files from [the KB template](./assets/template.md):
    metadata block (ID, Title, Created, Updated, Tags), Summary, Index, Sources, Related, then the knowledge sections exactly as listed in the Index.
+   - Store only model-gap knowledge: internal, non-public, organization-specific information the model would not already have. Skip general knowledge it already knows (AGENTS.md Section 3, rule 6).
+   - Write densely: information-rich, structured, direct — short lines and lists, no filler or long prose (rule 7).
    - Add the raw file name to Sources.
    - Update the Updated date.
    - If incoming knowledge conflicts with existing KB content, do NOT overwrite it: flag a contradiction (see the contradictions skill and AGENTS.md Section 11).

@@ -25,6 +25,7 @@ Periodic maintenance pass that keeps the memory healthy, like dreaming consolida
    - If two files genuinely cover one topic, merge into the file with the broader or more established slug, leave nothing behind, and remove the emptied file from its index. Record the merge in the kept file's Sources ("Merged from kb-<slug>, YYYY-MM-DD"). If any other file referenced the removed slug, repoint it.
    - If a file exceeds roughly 500 lines, split it by subtopic into new kb-<slug>.md files, updating index, Related and (for KB files) adding a note to Sources.
    - Refresh date-stamped volatile facts that are known to be outdated; if outdated but the current value is unknown, mark the line with "(possibly outdated as of YYYY-MM-DD)".
+   - Tighten verbose content: make it denser without losing information (AGENTS.md Section 3, rule 7), and drop any general knowledge the model already knows (rule 6).
    - Update the Updated date of every modified file.
 4. Update both index.md files to reflect any creations, merges, splits or topic changes.
 5. If any merge or split changed where ingested content lives, do NOT rewrite old tracker.md lines (it is append-only); instead append a correction line, e.g.:

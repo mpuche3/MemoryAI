@@ -16,6 +16,7 @@ The agent (GitHub Copilot in VS Code) operates this repository under a binding c
 
 ## Why This Design Wins
 
+- **Signal, not noise.** The memory stores only what a general language model does not already know — internal, non-public, organization-specific knowledge — written as densely as possible. No filler, no re-explaining what the model can already do.
 - **Token-efficient by construction.** Raw documents are heavy and noisy; distilled Markdown is light and dense. The agent consults a one-line-per-file index first and loads only the files it needs.
 - **Human-readable, human-auditable.** Every memory is plain text with a strict structure (metadata, summary, index, sources, related files). No tables, no rendering needed — you can read your agent's entire memory in a text editor and correct it with a keystroke.
 - **Full provenance.** Every knowledge file lists its sources; an append-only tracker records every ingested file and where its knowledge went; permanent Markdown snapshots of the originals are kept. You can always answer "why does the agent believe this?"

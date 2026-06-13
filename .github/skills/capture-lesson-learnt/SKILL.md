@@ -35,3 +35,5 @@ Persist experience gained during a session into lessons_learnt/, following the c
 - Record rules, not anecdotes: the future-facing rule is the most important part.
 - Be specific enough that a future session can apply the lesson without extra context.
 - Do not duplicate knowledge that belongs in knowledge_base/; link to the KB file instead.
+- Capture only model-gap lessons: things the model would not already know or do by default. Skip generic advice (AGENTS.md Section 3, rule 6).
+- Write densely: short, structured, direct — maximum information in minimum words, still readable (rule 7).

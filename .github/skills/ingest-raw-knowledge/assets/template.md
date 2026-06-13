@@ -25,7 +25,7 @@ A short paragraph describing what knowledge this file holds and its scope.
 
 # 1. First section title
 
-The actual knowledge, written as plain prose and lists. Never use Markdown tables.
+The actual knowledge as dense, well-structured notes: short lines and lists, not long prose. Store only what the model would not already know. Never use Markdown tables.
 
 # 2. Second section title
 

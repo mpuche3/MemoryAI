@@ -10,6 +10,8 @@ This repository is the persistent memory of an AI agent. It stores two kinds of 
 - knowledge_base/ : knowledge extracted from documents (manuals, papers, presentations, notes, ...).
 - lessons_learnt/ : lessons gained from experience during sessions with the user (errors made, solutions found, constraints discovered).
 
+Both memories store only what a general language model does not already know — internal, non-public, organization-specific knowledge — and store it densely (see Section 3, rules 6 and 7).
+
 All memory files are plain Markdown (.md) or text (.txt). This keeps the repository small while holding a large amount of information.
 
 ## 2. Repository Structure
@@ -25,13 +27,15 @@ All memory files are plain Markdown (.md) or text (.txt). This keeps the reposit
 - requirements.txt     : Python dependencies for the ingestion tooling.
 - .venv/               : Python virtual environment with markitdown[all] and pymupdf installed, used by the ingestion skill. Not committed to git.
 
-## 3. Global Formatting Rules
+## 3. Content and Formatting Rules
 
 1. NEVER use Markdown tables in any file in this repository. No exceptions. Files must read nicely as raw text without rendering.
 2. Use plain "Key: value" lines for metadata. No YAML front matter fences. The only exception is SKILL.md files under .github/skills/, which require YAML front matter for VS Code to discover them.
 3. Keep lines reasonably short and prose simple, so raw reading is comfortable.
 4. File names are descriptive slugs, never sequential numbers. Knowledge files are kb-<slug>.md, lesson files ll-<slug>.md, contradiction files cd-<slug>.md. The slug is lowercase kebab-case (letters a-z, digits, hyphens), naming the topic, e.g. kb-kubernetes-rollback.md, ll-git-rebase-onto-pitfall.md. Choose broad, stable slugs so renames are rare. This scheme lets several people add files in parallel without numbering collisions: a filename clash then means the same topic, which must be enriched rather than duplicated. The ID metadata field always equals the file name without .md.
 5. Date-stamp volatile facts. Knowledge that changes over time (versions, prices, APIs, settings, people in roles) must be phrased with its reference date, e.g. "As of 2026-06, the latest version is 1.27". Stable facts need no date.
+6. Store only what the model does not already know. These memories are for knowledge that was NOT available to general language models at training time: internal, non-public, organization-specific knowledge — processes, methodologies, conventions, internal jargon, project and system specifics — plus lessons from sessions with the user. Do NOT store general knowledge the model already has (how Python works, what HTTP is, common algorithms). If a fact is public and stable, it does not belong here.
+7. Keep knowledge dense. Write information-rich, well-structured, direct text: short sentences, lists and "Key: value" lines instead of long prose. Pack the most information into the fewest words while still reading nicely; shorter is better when no information is lost. Cut filler, repetition and obvious context.
 
 ## 4. Knowledge Base File Structure (kb-<slug>.md)
 
@@ -71,7 +75,7 @@ Index maintenance rule: whenever a KB or LL file is created, renamed, or its top
 When the user places files in raw_knowledge_files/ and asks for ingestion:
 
 1. Convert each raw file to Markdown with MarkItDown (see the ingest-raw-knowledge skill) and save the snapshot in raw_markdowns/ as <original_filename>.md. Snapshots are permanent.
-2. Read each raw file fully, using both the direct reading and the MarkItDown snapshot, and extract ALL information and knowledge from it.
+2. Read each raw file fully, using both the direct reading and the MarkItDown snapshot. Understand all of it, but store only the knowledge a general language model would not already have — internal, non-public, organization-specific information (Section 3, rule 6) — written densely (rule 7).
 3. For pdf, pptx, docx and xlsx files, also extract the visual content (rendered pages and embedded images) with the skill's image extraction script, view the images, and capture their knowledge as text. The extracted images are temporary and are deleted with the raw file.
 4. Decide placement by topic (see Section 8). Prefer enriching existing KB files over creating new ones.
 5. Write or update the KB file(s): update Summary, Index, Sources, Related and the Updated date as needed. If incoming knowledge contradicts existing KB content, do not overwrite it: flag a contradiction (see Section 11).
