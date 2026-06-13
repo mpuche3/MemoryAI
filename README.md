@@ -19,12 +19,14 @@ The agent (GitHub Copilot in VS Code) operates this repository under a binding c
 - **Token-efficient by construction.** Raw documents are heavy and noisy; distilled Markdown is light and dense. The agent consults a one-line-per-file index first and loads only the files it needs.
 - **Human-readable, human-auditable.** Every memory is plain text with a strict structure (metadata, summary, index, sources, related files). No tables, no rendering needed — you can read your agent's entire memory in a text editor and correct it with a keystroke.
 - **Full provenance.** Every knowledge file lists its sources; an append-only tracker records every ingested file and where its knowledge went; permanent Markdown snapshots of the originals are kept. You can always answer "why does the agent believe this?"
+- **Honest about conflicts.** When new knowledge contradicts what is already stored, the agent never silently overwrites it — it files the conflict in `contradictions/` for a human to resolve, so disagreements are surfaced, not buried.
 - **Versioned like code, because it is like code.** Git gives you history, diffs, rollback and backup of the agent's mind for free. One commit per ingestion = an audit trail of how the memory evolved.
 - **Self-maintaining.** The agent doesn't just write memory — it maintains it through built-in procedures (skills):
   - `ingest-raw-knowledge` — documents in, distilled knowledge out
   - `capture-lesson-learnt` — experience in, future-proof rules out
   - `validate-memory` — consistency checker for naming, indexes, structure and provenance
   - `dreaming` — periodic consolidation pass (like sleep does for memories): merge overlaps, fix drift, split oversized files
+  - `contradictions` — flag conflicting knowledge for human resolution instead of silently overwriting
 - **Grounded answers.** The contract obliges the agent to prefer repository evidence over model memory, cite the files it used, state its confidence, and say "I don't know" when the memory has no answer.
 
 ## Quick Start
@@ -42,6 +44,7 @@ The agent (GitHub Copilot in VS Code) operates this repository under a binding c
 - AGENTS.md — the contract: every convention, structure and workflow the agent must follow.
 - knowledge_base/ — KBxxxx.md knowledge files plus index.md.
 - lessons_learnt/ — LLxxxx.md lesson files plus index.md.
+- contradictions/ — conflicts the agent flagged for a human to resolve (empty when none are open).
 - raw_knowledge_files/ — ingestion inbox, plus the append-only tracker.md.
 - raw_markdowns/ — permanent MarkItDown snapshots of every ingested document.
 - .github/skills/ — the agent's procedures (ingestion, lessons, validation, dreaming).

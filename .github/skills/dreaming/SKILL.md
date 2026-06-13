@@ -21,6 +21,7 @@ Periodic maintenance pass that keeps the memory healthy, like dreaming consolida
    - Check the Index lists exactly the sections present, in order; fix mismatches.
    - Check Related links point to existing files and still make sense; add missing links (both directions), remove dead or irrelevant ones.
    - Check for content duplicated in another file: keep it in the file where it belongs topically, replace the duplicate with a Related reference.
+   - If two files disagree on a fact (not just overlap in topic), do NOT silently choose one: flag a contradiction (see the contradictions skill).
    - If two files genuinely cover one topic, merge into the lower-numbered file, leave nothing behind, and remove the emptied file from its index. Record the merge in the kept file's Sources ("Merged from KBxxxx, YYYY-MM-DD"). Never reuse the freed number.
    - If a file exceeds roughly 500 lines, split it by subtopic into new sequential files, updating index, Related and (for KB files) adding a note to Sources.
    - Refresh date-stamped volatile facts that are known to be outdated; if outdated but the current value is unknown, mark the line with "(possibly outdated as of YYYY-MM-DD)".

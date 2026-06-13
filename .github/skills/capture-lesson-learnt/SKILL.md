@@ -24,6 +24,7 @@ Persist experience gained during a session into lessons_learnt/, following the c
    - The content of each lesson must capture: the context, what was attempted, what went wrong or was discovered, the root cause if known, and the rule to follow in the future.
    - Sources line is usually "Session with user YYYY-MM-DD".
    - Cross-link related KB and LL files in Related (both directions when meaningful).
+   - If the lesson conflicts with an existing lesson or KB file, do NOT overwrite it: flag a contradiction (see the contradictions skill and AGENTS.md Section 11).
    - NEVER use Markdown tables. Plain "Key: value" lines, no YAML fences inside LL files.
    - If a file would exceed roughly 500 lines, split by subtopic.
 4. Update lessons_learnt/index.md if a file was created or its topic changed: one line per file, alphabetical order, format "LLxxxx.md - brief description".

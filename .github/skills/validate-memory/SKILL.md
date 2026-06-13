@@ -22,6 +22,7 @@ Run the consistency checker and fix what it reports, following the conventions i
    - no Markdown tables anywhere (except .github/),
    - metadata blocks (ID, Title, Created, Updated, Tags; ID matches file name; dates in YYYY-MM-DD),
    - required sections (Summary, Index, Sources, Related),
+   - contradiction files in contradictions/ (CD + 4 digits; metadata ID, Title, Created, Involves; required sections; no tables),
    - files over 500 lines (warning),
    - tracker.md lines referencing nonexistent KB files.
 3. Fix every ERROR. Warnings are judgment calls: report them to the user with a recommendation.

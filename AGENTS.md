@@ -18,6 +18,7 @@ All memory files are plain Markdown (.md) or text (.txt). This keeps the reposit
 - README.md            : human-facing description of the repository.
 - knowledge_base/      : knowledge files KB0000.md, KB0001.md, ... plus index.md.
 - lessons_learnt/      : lesson files LL0000.md, LL0001.md, ... plus index.md.
+- contradictions/      : open contradictions flagged for human resolution, as CD0000.md files plus README.md. Empty (only README) when none are open.
 - raw_knowledge_files/ : inbox for raw files (pdf, pptx, docx, md, txt, ...) waiting to be ingested. Contains tracker.md.
 - raw_markdowns/       : permanent Markdown snapshots of ingested raw files, produced by MarkItDown during ingestion. Named <original_filename>.md. Never deleted.
 - .github/skills/      : skills (step-by-step procedures) available to the agent, one folder per skill with a SKILL.md inside.
@@ -73,7 +74,7 @@ When the user places files in raw_knowledge_files/ and asks for ingestion:
 2. Read each raw file fully, using both the direct reading and the MarkItDown snapshot, and extract ALL information and knowledge from it.
 3. For pdf, pptx, docx and xlsx files, also extract the visual content (rendered pages and embedded images) with the skill's image extraction script, view the images, and capture their knowledge as text. The extracted images are temporary and are deleted with the raw file.
 4. Decide placement by topic (see Section 8). Prefer enriching existing KB files over creating new ones.
-5. Write or update the KB file(s): update Summary, Index, Sources, Related and the Updated date as needed.
+5. Write or update the KB file(s): update Summary, Index, Sources, Related and the Updated date as needed. If incoming knowledge contradicts existing KB content, do not overwrite it: flag a contradiction (see Section 11).
 6. Update knowledge_base/index.md if files were created or their topics changed.
 7. Record the ingestion in raw_knowledge_files/tracker.md (see Section 9).
 8. Delete the raw file (and its extracted images) after successful extraction, snapshot and tracker update.
@@ -102,7 +103,33 @@ Use interactions with the user to grow both memories:
 - If valuable information is discovered during a session (an error and its fix, a constraint, a working approach, a user preference), record it in lessons_learnt following Sections 5 and 6. Enrich an existing LL file if the topic already exists.
 - The objective is to continuously improve knowledge_base and lessons_learnt through the interactions with the user.
 
-## 11. Mandatory Answering Rules
+## 11. Contradictions
+
+When new knowledge conflicts with knowledge already stored, the agent must NEVER silently overwrite it or pick a winner on its own. It records the conflict in the contradictions/ folder for a human maintainer to resolve.
+
+- Folder: contradictions/. It holds one file per open contradiction plus a README.md that explains the folder. When the folder has only the README, there are no open contradictions.
+- File names: CD followed by exactly 4 digits (CD0000.md), numbered sequentially from the highest CD file currently present (CD0000 when the folder is empty). Because these files are transient, a number freed by resolution may be reused.
+- These files do NOT appear in any index and are NOT a source of knowledge for answers; they are a maintainer queue.
+
+File structure (plain lines and sections, no tables):
+
+1. Metadata: ID (CDxxxx), Title, Created (YYYY-MM-DD), Involves (the KB/LL files or incoming sources in conflict).
+2. Summary: one paragraph stating what contradicts what.
+3. Conflicting Claims: each claim with its exact source (file and section, or incoming raw file and date).
+4. Analysis: why they conflict, whether both could be true under a different scope or date, and the agent's confidence.
+5. Suggested Resolutions: options for the maintainer, with a recommendation if there is one.
+
+When to create one:
+
+- During ingestion, when an incoming document contradicts existing KB content.
+- During lesson capture, when a new lesson contradicts an existing lesson or KB file.
+- During dreaming or answering, when two stored files are found to disagree.
+
+Do not lose the new information: the contradiction file itself preserves both claims. Optionally add a one-line "Contradiction flagged: see CDxxxx" note to the Related section of each involved KB/LL file, and remove it when resolved.
+
+Lifecycle: created by the agent, then reviewed and decided by a human maintainer, then the agent applies the decision to the affected KB/LL files, then the contradiction file is deleted. The resolution is recorded by the edits to the KB/LL files and the git commit, not by keeping the CD file. See the contradictions skill.
+
+## 12. Mandatory Answering Rules
 
 1. Do not hallucinate.
 2. If unsure, explicitly state uncertainty.
@@ -110,21 +137,23 @@ Use interactions with the user to grow both memories:
 4. Prefer repository sources over model memory when answering questions.
 5. Cite the source files (KBxxxx, LLxxxx) used for each answer.
 
-## 12. Retrieval Protocol
+## 13. Retrieval Protocol
 
 1. Parse question intent and scope.
 2. Consult knowledge_base/index.md and lessons_learnt/index.md first to locate candidate files.
 3. If conflicting evidence exists, report the conflict and explain which source was chosen and why.
+4. Before answering, check contradictions/: if an open contradiction involves a file you are about to cite, surface it to the user and lower your confidence accordingly.
 
-## 13. Confidence Policy
+## 14. Confidence Policy
 
 Confidence must always be included in final answers:
 
 - High: direct, consistent evidence from relevant files.
 - Medium: partial evidence, some assumptions required.
 - Low: weak or outdated evidence, significant uncertainty.
+- An open contradiction involving a cited file caps confidence at Medium and must be surfaced.
 
-## 14. Out-Of-Scope Handling
+## 15. Out-Of-Scope Handling
 
 If the repository does not contain enough evidence:
 
@@ -132,7 +161,7 @@ If the repository does not contain enough evidence:
 - Ask targeted clarifying questions.
 - Suggest which knowledge documents should be added.
 
-## 15. Skills
+## 16. Skills
 
 Reusable procedures live in .github/skills/, one folder per skill with a SKILL.md describing when and how to perform the action. Current skills:
 
@@ -140,6 +169,7 @@ Reusable procedures live in .github/skills/, one folder per skill with a SKILL.m
 - capture-lesson-learnt  : record a lesson from the current session into lessons_learnt/ (implements Sections 5, 6 and 10).
 - validate-memory        : check repository consistency (naming, indexes, no tables, metadata, sections, tracker) and fix reported errors.
 - dreaming               : memory consolidation pass; merge overlaps, fix drifted summaries/indexes/links, split oversized files, then validate.
+- contradictions         : flag and resolve contradictions between stored knowledge (implements Section 11).
 
 When performing one of these actions, follow the corresponding skill. If a skill and this file ever disagree, this file wins; fix the skill.
 

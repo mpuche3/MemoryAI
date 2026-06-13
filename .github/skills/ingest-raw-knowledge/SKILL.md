@@ -38,6 +38,7 @@ Extract ALL information from raw files in raw_knowledge_files/ and store it in k
    metadata block (ID, Title, Created, Updated, Tags), Summary, Index, Sources, Related, then the knowledge sections exactly as listed in the Index.
    - Add the raw file name to Sources.
    - Update the Updated date.
+   - If incoming knowledge conflicts with existing KB content, do NOT overwrite it: flag a contradiction (see the contradictions skill and AGENTS.md Section 11).
    - Cross-link related KB and LL files in Related (both directions when meaningful).
    - NEVER use Markdown tables. Plain "Key: value" lines, no YAML fences inside KB files.
    - Date-stamp volatile facts (versions, prices, APIs, roles): "As of YYYY-MM, ...". Stable facts need no date.

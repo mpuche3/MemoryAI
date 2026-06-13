@@ -16,6 +16,8 @@ the conventions defined in AGENTS.md:
 6. Size: warns when a KB/LL file exceeds 500 lines.
 7. Tracker: raw_knowledge_files/tracker.md entries reference existing KB
    files.
+8. Contradictions: files in contradictions/ are named CD + 4 digits, have
+   ID/Title/Created/Involves metadata and the required sections.
 
 Usage (from the repository root):
   .venv\\Scripts\\python.exe .github\\skills\\validate-memory\\scripts\\validate_memory.py
@@ -124,11 +126,48 @@ def check_tracker() -> None:
                 error(f"raw_knowledge_files/tracker.md:{i}: references nonexistent {kb}.md")
 
 
+def check_contradictions() -> None:
+    folder = REPO_ROOT / "contradictions"
+    if not folder.exists():
+        return
+    pattern = re.compile(r"^CD\d{4}\.md$")
+    known = {p.name for p in (REPO_ROOT / "knowledge_base").glob("KB*.md")}
+    known |= {p.name for p in (REPO_ROOT / "lessons_learnt").glob("LL*.md")}
+    for path in sorted(folder.glob("*.md")):
+        if path.name == "README.md":
+            continue
+        rel = f"contradictions/{path.name}"
+        if not pattern.match(path.name):
+            error(f"{rel}: bad file name (expected CD + 4 digits + .md)")
+            continue
+        lines = path.read_text(encoding="utf-8").splitlines()
+        text = "\n".join(lines)
+        meta = {}
+        for line in lines[:12]:
+            m = re.match(r"^(ID|Title|Created|Involves):\s*(.*)$", line)
+            if m:
+                meta[m.group(1)] = m.group(2).strip()
+        for key in ("ID", "Title", "Created", "Involves"):
+            if key not in meta:
+                error(f"{rel}: missing metadata line '{key}:'")
+        if "ID" in meta and meta["ID"] != path.stem:
+            error(f"{rel}: metadata ID '{meta['ID']}' does not match file name")
+        if "Created" in meta and not re.match(r"^\d{4}-\d{2}-\d{2}$", meta["Created"]):
+            error(f"{rel}: Created is not in YYYY-MM-DD format")
+        for section in ("Summary", "Conflicting Claims", "Analysis", "Suggested Resolutions"):
+            if not re.search(rf"^#+\s*{re.escape(section)}\b", text, flags=re.MULTILINE):
+                error(f"{rel}: missing section '{section}'")
+        for ref in re.findall(r"(?:KB|LL)\d{4}", meta.get("Involves", "")):
+            if f"{ref}.md" not in known:
+                warn(f"{rel}: Involves references nonexistent {ref}.md")
+
+
 def main() -> int:
     check_folder("knowledge_base", "KB")
     check_folder("lessons_learnt", "LL")
     check_no_tables()
     check_tracker()
+    check_contradictions()
 
     for msg in WARNINGS:
         print(f"WARN:  {msg}")
